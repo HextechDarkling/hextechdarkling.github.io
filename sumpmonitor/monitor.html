@@ -15,8 +15,7 @@
 
         // JSONP request
         var jsonData = $.ajax({
-          url: 'https://data.sparkfun.com/output/' + public_key  +  '.json' + '?limit=3600' ,
-          data: {page: 1},
+          url: 'https://data.sparkfun.com/output/' + public_key  +  '.json',
           dataType: 'jsonp',
         }).done(function (results) {
 
