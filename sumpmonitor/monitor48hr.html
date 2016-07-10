@@ -15,7 +15,7 @@
 
         // JSONP request
         var jsonData = $.ajax({
-          url: 'https://data.sparkfun.com/output/' + public_key  +  '.json',
+          url: 'https://data.sparkfun.com/output/' + public_key  +  '.json?limit=2880',
           dataType: 'jsonp',
         }).done(function (results) {
 
@@ -56,6 +56,5 @@
   </head>
   <body>
     <div id="chart" style="width: 100%;"></div>
-	<a href="monitor48hr.html">48 hour data</a>
   </body>
 </html>
