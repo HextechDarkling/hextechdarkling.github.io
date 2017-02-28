@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- EXTERNAL LIBS-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="https://www.google.com/jsapi"></script>
+
+    <!-- EXAMPLE SCRIPT -->
+    <script>
+
+      // onload callback
+      function drawChart() {
+
+        var public_key = '8NpbBXG31YipE2NDALG3T0MLZdG';
+
+        // JSONP request
+        var jsonData = $.ajax({
+          url: 'http://city17.homenet.org:8080/output/' + public_key  +  '.json',
+          dataType: 'jsonp',
+         // data: {page: 1},
+          data: {limit:2880},
+        }).done(function (results) {
+
+          var data = new google.visualization.DataTable();
+
+          data.addColumn('datetime', 'Time');
+          data.addColumn('number', 'temp_0');
+          data.addColumn('number', 'temp_1');
+          data.addColumn('number', 'Outside Temp');
+          data.addColumn('number', 'temp_3');
+
+          $.each(results, function (i, row) {
+            data.addRow([
+              (new Date(row.timestamp)),
+              parseFloat(row.temp_0),
+              parseFloat(row.temp_1),
+              parseFloat(row.temp_2),
+              parseFloat(row.temp_3)
+            ]);
+          });
+
+          var chart = new google.visualization.LineChart($('#chart').get(0));
+
+          chart.draw(data, {
+            title: 'Temp Monitor'
+          });
+
+        });
+
+      }
+
+      // load chart lib
+      google.load('visualization', '1', {
+        packages: ['corechart']
+      });
+
+      // call drawChart once google charts is loaded
+      google.setOnLoadCallback(drawChart);
+
+    </script>
+
+  </head>
+  <body>
+    <div id="chart" style="width: 100%;"></div>
+  </body>
+</html>
