@@ -24,10 +24,10 @@
           var data = new google.visualization.DataTable();
 
           data.addColumn('datetime', 'Time');
-          data.addColumn('number', 'temp_0');
-          data.addColumn('number', 'temp_1');
+          data.addColumn('number', 'H20 Out');
+          data.addColumn('number', 'Plenum');
           data.addColumn('number', 'Outside Temp');
-          data.addColumn('number', 'temp_3');
+          data.addColumn('number', 'H2O In');
 
           $.each(results, function (i, row) {
             data.addRow([
