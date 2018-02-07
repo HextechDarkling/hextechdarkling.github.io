@@ -1,0 +1,79 @@
+
+<html>
+    <head>
+      <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+      <script src="https://sdk.amazonaws.com/js/aws-sdk-2.100.0.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
+
+
+      <script type="text/javascript">
+        const SEC_ONE_HOUR = 3600;
+        const SEC_ONE_DAY = 86400;
+
+        const SERIAL_NUMBER = "000000"
+        const TIME_WINDOW = SEC_ONE_HOUR * 4
+
+        
+        //Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages':['corechart']});
+
+        var myCredentials = new AWS.Credentials(accessKeyId = 'AKIAJ6ZGSXXYORNFQIXQ', secretAccessKey = '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');
+        AWS.config.update({credentials: myCredentials, region: 'us-east-1'});
+
+  
+        // Set a callback to run when the Google Visualization API is loaded.
+        google.charts.setOnLoadCallback(getData);
+  
+        function getData() {
+          var dynamodb = new AWS.DynamoDB();
+            var params = {
+                ExpressionAttributeNames: {
+                    "#TS" : "Timestamp"
+                },
+                ExpressionAttributeValues: {
+                    ":TS" : {N: String(Math.floor((new Date).getTime()/1000) - TIME_WINDOW )},
+                    ":SN" : {S: SERIAL_NUMBER}
+                },
+
+                KeyConditionExpression: "SerialNumber = :SN AND #TS > :TS",
+                TableName: "SumpMon-Data",
+                ReturnConsumedCapacity : "TOTAL",
+                ScanIndexForward: false
+            }
+           dynamodb.query(params, function(err, data){
+               if (err) console.log(err, err.stack);
+               else     drawChart(_.map(data.Items, function(value){
+                  return [new Date((Number(value.Timestamp.N) - 10800) * 1000) , Number(value.Level.N), Number(value.Temp.N)];
+               }));
+           });
+        }
+
+        // Callback that creates and populates a data table,
+        // instantiates the pie chart, passes in the data and
+        // draws it.
+        function drawChart( data ) {
+  
+          // Create the data table.
+          var table = new google.visualization.DataTable();
+          table.addColumn('datetime', 'Timestamp');
+          table.addColumn('number', 'Water Level');
+          table.addColumn('number', 'Temperature');
+          table.addRows(data);
+  
+          // Set chart options
+          var options = {'title':'HomeWatch',
+                         'width':1600,
+                         'height':600};
+  
+          // Instantiate and draw our chart, passing in some options.
+          var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+          chart.draw(table, options);
+        }
+      </script>
+    </head>
+  
+    <body>
+      <!--Div that will hold the pie chart-->
+      <div id="chart_div"></div>
+    </body>
+  </html>
